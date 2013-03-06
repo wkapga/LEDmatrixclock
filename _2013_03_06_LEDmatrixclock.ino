@@ -33,11 +33,20 @@ void setup() {
 void drawtimer2buffer(byte h, byte m ) {
 
 if (h > 12) h -= 12;
+
 if (h < 10) {
   for(int row=0;row<7;row++) {
     buffer[row] = font5x7[( 16 + h )*7 + row];
   }
 }
+
+if (h > 10) {
+  for(int row=0;row<7;row++) {
+    buffer[row] = font5x7special[( -10 + h )*7 + row];
+  }
+}
+
+
 
 
 }
