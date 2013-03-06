@@ -105,8 +105,8 @@ void getNTPtime() {
     unsigned long epoch = secsSince1900 - 2208988800UL;
     Serial.println(epoch); 
     
-    myhour = (byte) (epoch  % 86400L) / 3600 ;
-    myminute = (byte) (epoch  % 3600) / 60;
+    myhour =  (epoch  % 86400L) / 3600 ;
+    myminute =  (epoch  % 3600) / 60;
 
    Serial.println(myhour); 
     Serial.println(myminute); 
@@ -172,14 +172,14 @@ if (h < 10) {
 
 buffer[7] = 0;
 
-if ( m > 15) buffer[0] |= 1;
-if ( m > 30) buffer[1] |= 1;
-if ( m > 45) buffer[1] |= 2;
+if ( m > 14) buffer[0] |= 1;
+if ( m > 29) buffer[1] |= 1;
+if ( m > 44) buffer[1] |= 2;
 
 m = m % 15;
 
-if ( m > 5) buffer[3] |= 1;
-if ( m > 10) buffer[3] |= 2;
+if ( m > 4) buffer[3] |= 1;
+if ( m > 9) buffer[3] |= 2;
 
 m = m % 5;
 
