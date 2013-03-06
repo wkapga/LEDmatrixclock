@@ -38,17 +38,29 @@ if (h < 10) {
   for(int row=0;row<7;row++) {
     buffer[row] = font5x7[( 16 + h )*7 + row];
   }
-}
-
-if (h > 10) {
+} else {
   for(int row=0;row<7;row++) {
     buffer[row] = font5x7special[( -10 + h )*7 + row];
   }
 }
 
+buffer[7] = 0;
 
+if ( m > 15) buffer[0] |= 1;
+if ( m > 30) buffer[1] |= 1;
+if ( m > 45) buffer[1] |= 2;
 
+m = m % 15;
 
+if ( m > 5) buffer[3] |= 1;
+if ( m > 10) buffer[3] |= 2;
+
+m = m % 5;
+
+if ( m = 1) buffer[5] |= 1;
+if ( m = 2) buffer[6] |= 1;
+if ( m = 3) buffer[6] |= 2;
+if ( m = 4) buffer[5] |= 2;
 }
 
 
@@ -63,6 +75,14 @@ for(int row=0;row<8;row++) {
 
 void loop() { 
 
-drawtimer2buffer(7,14);
-buffer2led();
+for(int h=0;h<24;h++) {
+  for(int m=0;m<60;m++) {
+ 
+    drawtimer2buffer(h,m);
+    buffer2led();
+  }
+delay(100);
+}
+
+
 }
