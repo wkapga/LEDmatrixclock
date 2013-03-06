@@ -20,7 +20,7 @@ LedControl lc=LedControl(4,3,2,1);
 byte buffer[8] = {0};
 
 byte mac[] = { 0x00, 0x11, 0x95, 0x29, 0x0E, 0x92 };
-<<<<<<< HEAD
+
 byte ip[] = { 10, 0, 0, 40 };                  // ip address
 byte gateway[] = { 10, 0, 0, 138 };                  // internet access via router
 byte subnet[] = { 255, 0, 0, 0 };                   //subnet mask
@@ -28,12 +28,11 @@ byte subnet[] = { 255, 0, 0, 0 };                   //subnet mask
 unsigned int localPort = 8888;      // local port to listen for UDP packets
 
 IPAddress timeServer(91,118,20,250); // 0.at.pool.ntp.org
-=======
+
 
 unsigned int localPort = 8888;      // local port to listen for UDP packets
 
-IPAddress timeServer(132, 163, 4, 101); // time-a.timefreq.bldrdoc.gov NTP server
->>>>>>> be88a148a5dfac1bc0284ca44b7383f66b5018ba
+// IPAddress timeServer(132, 163, 4, 101); // time-a.timefreq.bldrdoc.gov NTP server
 // IPAddress timeServer(132, 163, 4, 102); // time-b.timefreq.bldrdoc.gov NTP server
 // IPAddress timeServer(132, 163, 4, 103); // time-c.timefreq.bldrdoc.gov NTP server
 
@@ -70,7 +69,7 @@ void setup() {
   /* and clear the display */
   lc.clearDisplay(0);
   
-<<<<<<< HEAD
+
   // start Ethernet and UDP
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");
@@ -79,14 +78,11 @@ void setup() {
       ;
   }
   
-=======
->>>>>>> be88a148a5dfac1bc0284ca44b7383f66b5018ba
+
   Udp.begin(localPort);
   
   
-  
-<<<<<<< HEAD
-=======
+
 }
 
 
@@ -137,7 +133,7 @@ unsigned long sendNTPpacket(IPAddress& address)
   Udp.beginPacket(address, 123); //NTP requests are to port 123
   Udp.write(packetBuffer,NTP_PACKET_SIZE);
   Udp.endPacket(); 
->>>>>>> be88a148a5dfac1bc0284ca44b7383f66b5018ba
+
 }
 
 
@@ -163,7 +159,7 @@ void getNTPtime() {
     myhour = (byte) (epoch  % 86400L) / 3600 ;
     myminute = (byte) (epoch  % 3600) / 60;
 
-  Serial.println(myhour); 
+   Serial.println(myhour); 
     Serial.println(myminute); 
     
 
@@ -265,11 +261,9 @@ void loop() {
   }
 
 } */
-<<<<<<< HEAD
-  getNTPtime();
-=======
 
->>>>>>> be88a148a5dfac1bc0284ca44b7383f66b5018ba
+  getNTPtime();
+
 
     drawtimer2buffer(myhour,myminute);
     buffer2led();
