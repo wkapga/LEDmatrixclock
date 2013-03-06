@@ -57,10 +57,10 @@ if ( m > 10) buffer[3] |= 2;
 
 m = m % 5;
 
-if ( m = 1) buffer[5] |= 1;
-if ( m = 2) buffer[6] |= 1;
-if ( m = 3) buffer[6] |= 2;
-if ( m = 4) buffer[5] |= 2;
+if ( m > 0) buffer[5] |= 1;
+if ( m > 1) buffer[6] |= 1;
+if ( m > 2) buffer[6] |= 2;
+if ( m > 3) buffer[5] |= 2;
 }
 
 
@@ -80,8 +80,9 @@ for(int h=0;h<24;h++) {
  
     drawtimer2buffer(h,m);
     buffer2led();
+    delay(400);
   }
-delay(100);
+
 }
 
 
