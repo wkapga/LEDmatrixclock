@@ -218,7 +218,7 @@ void loop() {
     buffer2led();
 
 delay(10000);
-  myminute++;
+  // myminute++;
   Serial.println("toc.");
 
 }
