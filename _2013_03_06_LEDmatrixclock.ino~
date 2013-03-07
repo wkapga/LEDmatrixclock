@@ -5,7 +5,6 @@
 #include <Ethernet.h>
 #include <EthernetUdp.h>
 
-
 // #include "font.h"
 /*
  Now we need a LedControl to work with.
@@ -17,8 +16,10 @@
  */
 LedControl lc=LedControl(4,3,2,1);
 
+// buffer for 8x8 ledmatrix
 byte buffer[8] = {0};
 
+// use your own mac
 byte mac[] = { 0x00, 0x11, 0x95, 0x29, 0x0E, 0x92 };
 
 byte ip[] = { 10, 0, 0, 40 };                  // ip address
@@ -28,12 +29,9 @@ byte subnet[] = { 255, 0, 0, 0 };                   //subnet mask
 unsigned int localPort = 8888;      // local port to listen for UDP packets
 
 IPAddress timeServer(91,118,20,250); // 0.at.pool.ntp.org
+// IPAddress timeServer(83,137,41,12); // 0.at.pool.ntp.org
 
 
-
-// IPAddress timeServer(132, 163, 4, 101); // time-a.timefreq.bldrdoc.gov NTP server
-// IPAddress timeServer(132, 163, 4, 102); // time-b.timefreq.bldrdoc.gov NTP server
-// IPAddress timeServer(132, 163, 4, 103); // time-c.timefreq.bldrdoc.gov NTP server
 
 const int NTP_PACKET_SIZE= 48; // NTP time stamp is in the first 48 bytes of the message
 
@@ -77,11 +75,8 @@ void setup() {
       ;
   }
   
-
   Udp.begin(localPort);
   
-  
-
 }
 
 
@@ -89,7 +84,7 @@ void setup() {
 void getNTPtime() {
 
   sendNTPpacket(timeServer); // send an NTP packet to a time server
- Serial.println("sending"); 
+  Serial.println("sending"); 
     // wait to see if a reply is available
   delay(2000);  
   if ( Udp.parsePacket() ) {  
@@ -108,13 +103,9 @@ void getNTPtime() {
     myhour =  (epoch  % 86400L) / 3600 ;
     myminute =  (epoch  % 3600) / 60;
 
-   Serial.println(myhour); 
+    Serial.println(myhour); 
     Serial.println(myminute); 
     
-
-    /*drawtimer2buffer(5,27);
-    buffer2led();*/
-
   } else {
     Serial.println("no answer"); 
   }
@@ -146,16 +137,6 @@ unsigned long sendNTPpacket(IPAddress& address)
 }
 
 
-
-
-
-
-
-
-
-
-
-
 void drawtimer2buffer(byte h, byte m ) {
 
 if (h > 12) h -= 12;
@@ -170,49 +151,48 @@ if (h < 10) {
   }
 }
 
-buffer[7] = 0;
+buffer[7] = 0; // make sure puffer is clean in last row
 
-if ( m > 14) buffer[0] |= 1;
+if ( m > 14) buffer[0] |= 1; //for 1.quarter hour set last led in 1st row
 if ( m > 29) buffer[1] |= 1;
 if ( m > 44) buffer[1] |= 2;
 
 m = m % 15;
 
-if ( m > 4) buffer[3] |= 1;
+if ( m > 4) buffer[3] |= 1;  // 5mins in 4th row
 if ( m > 9) buffer[3] |= 2;
 
 m = m % 5;
 
-if ( m > 0) buffer[5] |= 1;
+if ( m > 0) buffer[5] |= 1; // mins 1to4 in 6th and 7th row
 if ( m > 1) buffer[6] |= 1;
 if ( m > 2) buffer[6] |= 2;
 if ( m > 3) buffer[5] |= 2;
 }
 
-
-
 void buffer2led() {
-for(int row=0;row<8;row++) {
-  lc.setRow(0,row,buffer[row]);
+  for(int row=0;row<8;row++) {
+    lc.setRow(0,row,buffer[row]); // write buffer to ledmatrix
   }
-
 }
 
 
-void loop() { 
-
-/* for(int h=0;h<24;h++) {
-  for(int m=0;m<60;m++) {
+void loopthedayfast() {
+  for(int h=0;h<24;h++) { //for testing loop through all minutes
+    for(int m=0;m<60;m++) {
  
     drawtimer2buffer(h,m);
     buffer2led();
     delay(400);
-  }
+    }
+  } 
+}
 
-} */
+void loop() { 
 
-  getNTPtime();
+  // loopthedayfast();
 
+    getNTPtime();
 
     drawtimer2buffer(myhour,myminute);
     buffer2led();
