@@ -1,3 +1,14 @@
+
+#define DEBUG //(un)comment this line for debug
+
+#ifdef DEBUG
+	#define DEBUG_PRINT(x) Serial.println(x)
+#else
+	#define DEBUG_PRINT(x) 
+#endif
+
+
+
 //We always have to include the library
 #include "LedControl.h"
 #include "LEDmatrixclockfont.h"
@@ -46,12 +57,13 @@ byte myminute = 0;
 
 
 void setup() {
-  
+
+#ifdef DEBUG
  Serial.begin(9600);
    while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   } 
-  
+#endif
   
   //Ethernet.begin(mac, ip, gateway, subnet);
   // delay(1000);
@@ -69,7 +81,7 @@ void setup() {
 
   // start Ethernet and UDP
   if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
+    DEBUG_PRINT("Failed to configure Ethernet using DHCP");
     // no point in carrying on, so do nothing forevermore:
     for(;;)
       ;
@@ -84,8 +96,10 @@ void setup() {
 void getNTPtime() {
 
   sendNTPpacket(timeServer); // send an NTP packet to a time server
-  Serial.println("sending"); 
-    // wait to see if a reply is available
+
+  DEBUG_PRINT("sending"); 
+  
+  // wait to see if a reply is available
   delay(2000);  
   if ( Udp.parsePacket() ) {  
     // We've received a packet, read the data from it
@@ -98,16 +112,16 @@ void getNTPtime() {
     unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
     unsigned long secsSince1900 = highWord << 16 | lowWord;    
     unsigned long epoch = secsSince1900 - 2208988800UL;
-    Serial.println(epoch); 
+    DEBUG_PRINT(epoch); 
     
     myhour =  (epoch  % 86400L) / 3600 ;
     myminute =  (epoch  % 3600) / 60;
 
-    Serial.println(myhour); 
-    Serial.println(myminute); 
+    DEBUG_PRINT(myhour); 
+    DEBUG_PRINT(myminute); 
     
   } else {
-    Serial.println("no answer"); 
+    DEBUG_PRINT("no answer"); 
   }
 }
 
@@ -198,6 +212,6 @@ void loop() {
     buffer2led();
 
   delay(10000); // ntp request every 10 secs? just for testing :-)
-  Serial.println("toc.");
+  DEBUG_PRINT("toc.");
 
 }
