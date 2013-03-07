@@ -30,6 +30,8 @@ LedControl lc=LedControl(4,3,2,1);
 // buffer for 8x8 ledmatrix
 byte buffer[8] = {0};
 
+byte bufferright[8] = {0};
+
 // use your own mac
 byte mac[] = { 0x00, 0x11, 0x95, 0x29, 0x0E, 0x92 };
 
@@ -190,6 +192,17 @@ void buffer2led() {
   }
 }
 
+void longbuffer2led(byte shift){
+  for(int row=0;row<8;row++) {
+    byte temp = (buffer[row] << shift ) | (unsigned(bufferright[row]) >> ( 8 - shift) ;
+
+    lc.setRow(0,row,temp); // write buffer to ledmatrix
+  }
+
+
+
+
+}
 
 void loopthedayfast() {
   for(int h=0;h<24;h++) { //for testing loop through all minutes
