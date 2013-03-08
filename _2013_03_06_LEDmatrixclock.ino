@@ -1,5 +1,5 @@
 
-#define DEBUG //(un)comment this line for debug
+ // #define DEBUG //(un)comment this line for debug
 
 #ifdef DEBUG
 	#define DEBUG_PRINT(x) Serial.println(x)
@@ -219,18 +219,24 @@ void clearbuffer() {
 void scrollastring(char message[]){
 //clear buffer and screen
 clearbuffer();
+drawtimer2buffer(10,22);
 buffer2led();
+ message=" 12:40 ";
 
-for(int i=0;i=strlen(message);i++){
+// for(int i=0;i<=strlen(message);i++){
+for(int i=0;i<6;i++){
+ 
+  DEBUG_PRINT(message[i]); 
   //load character in right buffer
   if  ( (message[i] >= 0x20) && (message[i] <= 0x7f) ) { //only characters in font
     for(int row=0;row<7;row++) {
       buffer[row] = font5x7[( message[i] - 0x20 )*7 + row]; //ascii conversion
     }
     // shift left and display 5 times (for 6x4font)
-    for(int row=0;row<7;row++) {
+    for(int j=0;j<6;j++) {
       shiftbuffer();
       buffer2led;
+      delay(200);
     }   
   }
 }
@@ -252,9 +258,27 @@ void loopthedayfast() {
 
 void loop() { 
 
-  // loopthedayfast();
 
-    getNTPtime();
+drawtimer2buffer(11,11);
+buffer2led();
+delay(1000);
+
+shiftbuffer();
+buffer2led();
+delay(2000);
+
+for (int z=1; z<7 ; z++){ 
+shiftbuffer();
+buffer2led();
+delay(2000);
+}
+  
+  
+//  scrollastring(" 12:40 ");
+
+   loopthedayfast();
+
+//     getNTPtime();
 
     drawtimer2buffer(myhour,myminute);
     buffer2led();
