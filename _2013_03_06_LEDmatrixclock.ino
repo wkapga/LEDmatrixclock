@@ -195,7 +195,7 @@ void buffer2led() {
 
 void longbuffer2led(byte shift){
   for(int row=0;row<8;row++) {
-    byte temp = (buffer[row] << shift ) | (unsigned(bufferright[row]) >> ( 8 - shift) ;
+    byte temp = (buffer[row] << shift ) | (unsigned(bufferright[row]) >> ( 8 - shift) );
 
     lc.setRow(0,row,temp); // write selection from buffers to ledmatrix
   }
