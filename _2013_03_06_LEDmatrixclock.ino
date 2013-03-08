@@ -22,7 +22,7 @@
 
  pin 4 is connected to the DataIn 
  pin 3 is connected to the CLK 
- pin 2 is connected to CS (=LOAD?) 
+ pin 2 is connected to CS/LOAD 
  We have only a single MAX72XX.
  */
 LedControl lc=LedControl(4,3,2,1);
@@ -31,6 +31,7 @@ LedControl lc=LedControl(4,3,2,1);
 byte buffer[8] = {0};
 
 byte bufferright[8] = {0};
+
 
 // use your own mac
 byte mac[] = { 0x00, 0x11, 0x95, 0x29, 0x0E, 0x92 };
@@ -198,11 +199,45 @@ void longbuffer2led(byte shift){
 
     lc.setRow(0,row,temp); // write selection from buffers to ledmatrix
   }
+}
 
+void shiftbuffer() {
 
+  for(int row=0;row<8;row++) {
+    buffer[row] <<= 1; //shift buffer one to left
+    buffer[row] |= (unsigned(bufferright[row]) >> 7 ); // insert leftmost pixel of bufferrright , make sure via unsingned that minus-sign is not carried over
+    bufferright[row] <<= 1; //shift rightbuffer to left
+  }
+}
+
+void clearbuffer() {
+  for(int row=0;row<8;row++) {
+    buffer[row] = 0;
+  }
+}
+
+void scrollastring(char message[]){
+//clear buffer and screen
+clearbuffer();
+buffer2led();
+
+for(int i=0;i=strlen(message);i++){
+  //load character in right buffer
+  if  ( (message[i] >= 0x20) && (message[i] <= 0x7f) ) { //only characters in font
+    for(int row=0;row<7;row++) {
+      buffer[row] = font5x7[( message[i] - 0x20 )*7 + row]; //ascii conversion
+    }
+    // shift left and display 5 times (for 6x4font)
+    for(int row=0;row<7;row++) {
+      shiftbuffer();
+      buffer2led;
+    }   
+  }
+}
 
 
 }
+
 
 void loopthedayfast() {
   for(int h=0;h<24;h++) { //for testing loop through all minutes
