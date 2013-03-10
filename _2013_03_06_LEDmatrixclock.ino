@@ -15,6 +15,7 @@
 #include <SPI.h>         
 #include <Ethernet.h>
 #include <EthernetUdp.h>
+#include <Time.h>
 
 // #include "font.h"
 /*
@@ -92,6 +93,8 @@ void setup() {
   
   Udp.begin(localPort);
   
+  getNTPtime();
+  
 }
 
 
@@ -117,8 +120,10 @@ void getNTPtime() {
     unsigned long epoch = secsSince1900 - 2208988800UL;
     DEBUG_PRINT(epoch); 
     
-    myhour =  (epoch  % 86400L) / 3600 ;
-    myminute =  (epoch  % 3600) / 60;
+    // myhour =  (epoch  % 86400L) / 3600 ;
+    // myminute =  (epoch  % 3600) / 60;
+
+   setTime(epoch);
 
     DEBUG_PRINT(myhour); 
     DEBUG_PRINT(myminute); 
@@ -258,19 +263,20 @@ void loopthedayfast() {
 
 void loop() { 
 
+  time_t t = now();
  
  
-  
-  scrollastring("AB#7 12:40 ");
+ 
+ char msg[8];
+  sprintf(msg,"%d:%02d",hour(t),minute(t));
+  scrollastring( msg  );
 
    loopthedayfast();
 
-//     getNTPtime();
+
 
     drawtimer2buffer(myhour,myminute);
     buffer2led();
 
-  delay(10000); // ntp request every 10 secs? just for testing :-)
-  DEBUG_PRINT("toc.");
-
+  
 }
