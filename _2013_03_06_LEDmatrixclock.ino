@@ -190,19 +190,13 @@ if ( m > 0) buffer[5] |= 1; // mins 1to4 in 6th and 7th row
 if ( m > 1) buffer[6] |= 1;
 if ( m > 2) buffer[6] |= 2;
 if ( m > 3) buffer[5] |= 2;
+
+buffer2led();
 }
 
 void buffer2led() {
   for(int row=0;row<8;row++) {
     lc.setRow(0,row,buffer[row]); // write buffer to ledmatrix
-  }
-}
-
-void longbuffer2led(byte shift){
-  for(int row=0;row<8;row++) {
-    byte temp = (buffer[row] << shift ) | (unsigned(bufferright[row]) >> ( 8 - shift) );
-
-    lc.setRow(0,row,temp); // write selection from buffers to ledmatrix
   }
 }
 
@@ -231,6 +225,7 @@ void loadchar2bufferright (int ascii) {
 
 
 void scrollastring(char  message[] ){
+
 //clear buffer and screen
  clearbuffer();
  buffer2led();
@@ -261,22 +256,39 @@ void loopthedayfast() {
   } 
 }
 
+void scrolltime() {
+	char msg[8];
+ 
+	time_t t = now();
+	sprintf(msg,"%d:%02d",hour(t),minute(t));
+	scrollastring( msg  );
+}
+void scrolltime() {
+	char msg[8];
+ 
+	time_t t = now();
+	sprintf(msg,"%d:%02d",hour(t),minute(t));
+	scrollastring( msg  );
+}
+
+void scrolldate() {
+	char msg[];
+	const char dayname[7][2]={"SO","MO","DI","MI","DO","FR","SA"};
+	time_t t = now();
+	
+	sprintf(msg,"%s %d.%d".,dayname[weekday(t)-1],day(t),month(t));
+	scrollastring( msg  );
+}
+
+
+
 void loop() { 
 
-  time_t t = now();
- 
- 
- 
- char msg[8];
-  sprintf(msg,"%d:%02d",hour(t),minute(t));
-  scrollastring( msg  );
+	scrolltime();
+	scrolldate();
 
-   loopthedayfast();
+ //   loopthedayfast();
 
-
-
-    drawtimer2buffer(myhour,myminute);
-    buffer2led();
-
-  
+    drawtimer2buffer(hour(),minute());
+    delay(2000);
 }
