@@ -260,23 +260,17 @@ void scrolltime() {
 	char msg[8];
  
 	time_t t = now();
-	sprintf(msg,"%d:%02d",hour(t),minute(t));
-	scrollastring( msg  );
-}
-void scrolltime() {
-	char msg[8];
- 
-	time_t t = now();
-	sprintf(msg,"%d:%02d",hour(t),minute(t));
+	sprintf(msg,"%d:%02d  ",hour(t),minute(t));
 	scrollastring( msg  );
 }
 
+
 void scrolldate() {
-	char msg[];
-	const char dayname[7][2]={"SO","MO","DI","MI","DO","FR","SA"};
+	char msg[8];
+	const char dayname[7][3]={"SO","MO","DI","MI","DO","FR","SA"};
 	time_t t = now();
 	
-	sprintf(msg,"%s %d.%d".,dayname[weekday(t)-1],day(t),month(t));
+	sprintf(msg,"%s %d.%d. ",dayname[weekday(t)-1],day(t),month(t));
 	scrollastring( msg  );
 }
 
