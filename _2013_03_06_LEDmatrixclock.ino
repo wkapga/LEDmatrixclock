@@ -258,9 +258,20 @@ void loopthedayfast() {
 
 void scrolltime() {
 	char msg[8];
- 
+	byte h;
+	
+	
+	
 	time_t t = now();
-	sprintf(msg,"%d:%02d  ",hour(t),minute(t));
+	
+	if (( (month(t)>3) && month(t)<10) | (1) ) {
+		h=hour(t) +2;
+	} else {
+		h=hour(t)+1;
+	} 
+	
+	
+	sprintf(msg,"%d:%02d  ",h,minute(t));
 	scrollastring( msg  );
 }
 
