@@ -256,20 +256,40 @@ void loopthedayfast() {
   } 
 }
 
+time_t adjusttimetoCET(time_t t) {
+
+time_t t1;
+int hours:
+
+int m = month(t);
+int y = year(t);
+int d = day(t);
+
+// EU summertime rules
+int marchday = 31 - ((5*y/4 +4) mod 7);
+int octoberday = 31 - ((5*y/4 +1) mod 7);
+
+if ( (m < 3) || (m > 10) || 
+	( (m ==3) && ( d < marchday) ) || 
+	( (m == 10) && (d >= octoberday) ) ) {
+		hours = 1; // hardcoded for CE(S)T
+	} else {
+		hours = 2;
+}
+
+t1 = setTime(t+ 3600 * hours);
+
+return t1;
+}
+
+
 void scrolltime() {
 	char msg[8];
 	byte h;
 	
-	
-	
 	time_t t = now();
 	
-	if (( (month(t)>3) && month(t)<10) | (1) ) {
-		h=hour(t) +2;
-	} else {
-		h=hour(t)+1;
-	} 
-	
+	t = adjusttimetoCET(t);
 	
 	sprintf(msg,"%d:%02d  ",h,minute(t));
 	scrollastring( msg  );
@@ -293,7 +313,7 @@ void loop() {
 	scrolldate();
 
  //   loopthedayfast();
-
-    drawtimer2buffer(hour(),minute());
+	time_t t = adjusttimetoCET(now());
+    drawtimer2buffer(hour(t),minute(t));
     delay(2000);
 }
