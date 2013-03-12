@@ -282,15 +282,13 @@ int d = day(t);
 int marchday = 31 - ((5*y/4 +4) % 7);
 int octoberday = 31 - ((5*y/4 +1) % 7);
 
-if ( (m < 3) || (m > 10) || 
-	( (m ==3) && ( d < marchday) ) || 
-	( (m == 10) && (d >= octoberday) ) ) {
+if ( (m < 3) || (m > 10) ||   // nov-feb is winter
+	( (m ==3) && ( d < marchday) ) ||  // so is before last sunday in march
+	( (m == 10) && (d >= octoberday) ) ) { // and also from last sunday in october
 		hours = 1; // hardcoded for CE(S)T
 	} else {
-		hours = 2;
+		hours = 2; // summertime!
 }
-
-// t1 = setTime(t+ 3600 * hours);
 
 return hours;
 }
@@ -298,13 +296,11 @@ return hours;
 
 void scrolltime() {
 	char msg[8];
-	byte h;
 	
 	time_t t = now();
-	
 	t = t + 3600 * adjusttimetoCET(t);
 	
-	sprintf(msg,"%d:%02d  ",h,minute(t));
+	sprintf(msg,"%d:%02d  ",hour(t),minute(t));
 	scrollastring( msg  );
 }
 
@@ -313,6 +309,7 @@ void scrolldate() {
 	char msg[8];
 	const char dayname[7][3]={"SO","MO","DI","MI","DO","FR","SA"};
 	time_t t = now();
+	t = t + 3600 * adjusttimetoCET(t);
 	
 	sprintf(msg,"%s %d.%d. ",dayname[weekday(t)-1],day(t),month(t));
 	scrollastring( msg  );
