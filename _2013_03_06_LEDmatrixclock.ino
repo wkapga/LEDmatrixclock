@@ -311,7 +311,7 @@ void scrolldate() {
 	time_t t = now();
 	t = t + 3600 * adjusttimetoCET(t);
 	
-	sprintf(msg,"%s %d.%d. ",dayname[weekday(t)-1],day(t),month(t));
+	sprintf(msg,"%s.%d.%d. ",dayname[weekday(t)-1],day(t),month(t));
 	scrollastring( msg  );
 }
 
