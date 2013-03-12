@@ -46,7 +46,7 @@ unsigned int localPort = 8888;      // local port to listen for UDP packets
 IPAddress timeServer(91,118,20,250); // 0.at.pool.ntp.org
 // IPAddress timeServer(83,137,41,12); // 0.at.pool.ntp.org
 
-
+EthernetClient client;
 
 const int NTP_PACKET_SIZE= 48; // NTP time stamp is in the first 48 bytes of the message
 
@@ -157,6 +157,20 @@ unsigned long sendNTPpacket(IPAddress& address)
   Udp.write(packetBuffer,NTP_PACKET_SIZE);
   Udp.endPacket(); 
 }
+
+void fetchwebdata() {
+
+byte server[] = {10,0,0,21};
+	if (client.connect(server,80)) {
+	client.println("GET /GRAFIK.htm");
+	client.println();
+	} else {
+	DEBUG_PRINT( "web connecction failed");
+	}
+
+
+}
+
 
 
 void drawtimer2buffer(byte h, byte m ) {
