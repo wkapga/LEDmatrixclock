@@ -323,7 +323,8 @@ void loop() {
 	scrolldate();
 
  //   loopthedayfast();
-	time_t t = adjusttimetoCET(now());
+	time_t t = now();
+	t = t + 3600 * adjusttimetoCET(t);
     drawtimer2buffer(hour(t),minute(t));
     delay(2000);
 }
