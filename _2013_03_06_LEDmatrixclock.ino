@@ -33,6 +33,7 @@ byte buffer[8] = {0};
 
 byte bufferright[8] = {0};
 
+const int scrolldelay = 60;
 
 // use your own mac
 byte mac[] = { 0x00, 0x11, 0x95, 0x29, 0x0E, 0x92 };
@@ -253,7 +254,7 @@ for(int i=0;message[i]!=0;i++){
 	for (int z=1; z<7 ; z++){ 
 		shiftbuffer();
 		buffer2led();
-		delay(60);
+		delay(scrolldelay);
 	}  
 }
 
@@ -326,5 +327,5 @@ void loop() {
 	time_t t = now();
 	t = t + 3600 * adjusttimetoCET(t);
     drawtimer2buffer(hour(t),minute(t));
-    delay(2000);
+    delay(3000);
 }
