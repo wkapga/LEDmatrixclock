@@ -319,7 +319,14 @@ void scrolldate() {
 
 
 void loop() { 
-
+	time_t t = now();
+	if  (((minute(t) % 5) == 1 ) && (second(t) == 42 ) )  { //every 5 minutes
+		fetchwebdata();
+	}
+	if ((hour(t) == 1) && (minute(t) == 21 ) && (second(t) == 42 ) ) { 
+		getNTPtime(); // daily 01:21:42
+	} 
+	
 	scrolltime();
 	scrolldate();
 
