@@ -72,9 +72,31 @@ void shiftbuffer() {
   }
 }
 
-void clearbuffer() {
+void shiftbufferleft(int bufffrom, int buffto) {
+//for each row
   for(int row=0;row<8;row++) {
-    buffer[row] = 0;
+    //scroll "to" (left) buffer one pixel to the left
+    buffer[row,buffto] =  buffer[row,buffto] << 1;
+    // copy highest (leftmost) pixel over   
+    buffer[row,buffto] =  buffer[row,buffto] | ( buffer[row,bufffrom] >> 7;
+  }
+}
+
+void shiftdisplayleft(int nrofbuffer) { //3 matrix = 5 buffer
+/* shift very left (3) buffer to invisible (4)
+  continue till very right (1) which gets data from invisble (0) 
+*/
+  for(int i=nrofbuffer-1;i=1;i--) { 
+    shiftbufferleft(i-1,i);
+  }
+}
+
+
+void clearbuffer( int nrofbuffer) {
+  for (int bufid=0;buffid<nrofbuffer;row++) {
+    for(int row=0;row<8;row++) {
+      buffer[row,buffid] = 0;
+    }
   }
 }
 
@@ -117,9 +139,14 @@ void loop() {
 // This is the main loop
 
 // test
+clearbuffer(5);
 buffer[2,1]= 19; // 1+2+16.. 1st, 2nd, and 4th dot in 3rd line
-buffer2led(buffer[2,1],0];
+buffer2led(buffer[2,1,0];
 
 	
     delay(3000);
+
+ shiftdisplayleft(5)
+
+
 }
