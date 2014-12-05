@@ -23,21 +23,23 @@
 // LedControl lc=LedControl(4,3,2,1); pins 2,3,4 - 1 matrix
 LedControl lc=LedControl(4,3,2,3); // 3x ledmatrix
 
-// buffer for 8x8 ledmatrix
-
+// 5 buffers for 3 pcs 8x8 ledmatrix
+// 8 bytes for each line
 uint8_t buffer[8][5] = {0};
 
 /*
  buffer[][0] is invisible right to the display
  buffer[][1:3] is the visible part on 3 matrix
  buffer[][4] is invisible left to the display
+LED:    x 2 1 0 x
+Buffer: 4 3 2 1 0
 */
 
 const int scrolldelay = 60;
 
 void setup() {
   // init all matrix
-  //nr was set when  creating LedControl
+  // nr was set when  creating LedControl
   int devices=lc.getDeviceCount();
   //init  loop
   for(int address=0;address<devices;address++) {
@@ -50,30 +52,24 @@ void setup() {
   }
 }
 
+void loop() { 
+// This is the main loop
 
+// test
+	clearbuffer(5);
+	buffer[2][1]= 19; // 1+2+16.. 1st, 2nd, and 4th dot in 3rd line
+	buffer2led(2,1);
+
+    delay(3000);
+
+	shiftdisplayleft(5);
+}
 
 void buffer2led(int LEDid, int buffid) {
+// write buffer[][buffid] to ledmatrix
+// LEDid is 0(right) to 2(left)
   for(int row=0;row<8;row++) {
-    lc.setRow(LEDid,row,buffer[row][buffid]); // write buffer to ledmatrix
-  }
-}
-/*
-void shiftbuffer() {
-
-  for(int row=0;row<8;row++) {
-    buffer[row] = buffer[row]<< 1; //shift buffer one to left
-    buffer[row] = buffer[row] |  ( bufferright[row] >> 7 ); // insert leftmost pixel of bufferrright , make sure via unsingned that minus-sign is not carried over
-    bufferright[row] <<= 1; //shift rightbuffer to left
-  }
-}*/
-
-void shiftbufferleft(int bufffrom, int buffto) {
-//for each row
-  for(int row=0;row<8;row++) {
-    //scroll "to" (left) buffer one pixel to the left
-    buffer[row][buffto] =  buffer[row][buffto] << 1;
-    // copy highest (leftmost) pixel over   
-    buffer[row][buffto] =  buffer[row][buffto] | ( buffer[row][bufffrom] >> 7 );
+    lc.setRow(LEDid,row,buffer[row][buffid]); 
   }
 }
 
@@ -86,25 +82,37 @@ void shiftdisplayleft(int nrofbuffer) { //3 matrix = 5 buffer
   }
 }
 
+void shiftbufferleft(int bufffrom, int buffto) {
+/* scroll by 1 pixel: shift "to" 1 pixel left, 
+copy leftmost pixel of "from" over as rightmost */
+  for(int row=0;row<8;row++) { //for each row
+    //scroll "to" (left) buffer one pixel to the left
+    buffer[row][buffto] =  buffer[row][buffto] << 1;
+    // copy highest (leftmost) pixel over   
+    buffer[row][buffto] =  buffer[row][buffto] | ( buffer[row][bufffrom] >> 7 );
+  }
+}
 
 void clearbuffer( int nrofbuffer) {
+// write zeros to all rows of all buffers 
   for (int buffid=0;buffid<nrofbuffer;buffid++) {
     for(int row=0;row<8;row++) {
       buffer[row][buffid] = 0;
     }
   }
 }
-/*
-void loadchar2bufferright (int ascii) {
+
+void loadchar2buffer (int ascii, int buffid) {
+// copy row by row of select char to buffer (normally buffer 0)
 	if  ( (ascii >= 0x20) && (ascii <= 0x7f) ) {
 		for(int row=0;row<7;row++) {
-			buffer[row] = font5x7[( ascii - 0x20 )*7 + row]; 
+			buffer[row][buffid] = font5x7[( ascii - 0x20 )*7 + row]; 
 			//ascii conversion
-			}
 		}
 	}
+}
 
-
+/*
 void scrollastring(char  message[] ){
 
 //clear buffer and screen
@@ -127,18 +135,3 @@ for(int i=0;message[i]!=0;i++){
 }*/
 
 
-void loop() { 
-// This is the main loop
-
-// test
-clearbuffer(5);
-buffer[2][1]= 19; // 1+2+16.. 1st, 2nd, and 4th dot in 3rd line
-buffer2led(2,1);
-
-	
-    delay(3000);
-
- shiftdisplayleft(5);
-
-
-}
