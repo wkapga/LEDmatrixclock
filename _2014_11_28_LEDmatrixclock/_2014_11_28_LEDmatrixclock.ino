@@ -73,6 +73,13 @@ void buffer2led(int LEDid, int buffid) {
   }
 }
 
+void bufferrow2led() {
+// copy visible buffers1-3 to LED0-2
+  for(int i=0;i<3;i++) {
+	  buffer2led(i, i+1);
+  }
+}
+
 void shiftdisplayleft(int nrofbuffer) { //3 matrix = 5 buffer
 /* shift very left (3) buffer to invisible (4)
   continue till very right (1) which gets data from invisble (0) 
@@ -112,26 +119,23 @@ void loadchar2buffer (int ascii, int buffid) {
 	}
 }
 
-/*
 void scrollastring(char  message[] ){
-
 //clear buffer and screen
- clearbuffer();
- buffer2led();
+ clearbuffer(5);
+ bufferrow2led();
 
-for(int i=0;message[i]!=0;i++){
+	for(int i=0;message[i]!=0;i++){
  
-	DEBUG_PRINT(message[i]); 
-  //load character in right buffer
-	loadchar2bufferright(message[i]);
-    // shift left and display 5 times (for 5x7font)
-	for (int z=1; z<7 ; z++){ 
-		shiftbuffer();
-		buffer2led();
-		delay(scrolldelay);
-	}  
+		DEBUG_PRINT(message[i]); 
+		//load character in right buffer
+		loadchar2buffer(message[i],0);
+		// shift left and display 5 times (for 5x7font)
+		for (int z=1; z<7 ; z++){ 
+			shiftbuffer();
+			bufferrow2led();
+			delay(scrolldelay);
+		}  
+	}
 }
-
-}*/
 
 
