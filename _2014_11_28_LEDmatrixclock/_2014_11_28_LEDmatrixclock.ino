@@ -13,24 +13,24 @@
 
 /* Hardware
 
- pin 4 is connected to the DataIn 
- pin 3 is connected to the CLK 
- pin 2 is connected to CS/LOAD 
+ pin 12 is connected to the DataIn 
+ pin 11 is connected to the CLK 
+ pin 10 is connected to CS/LOAD 
  We have only a single MAX72XX.
  */
 
 
 // LedControl lc=LedControl(4,3,2,1); pins 2,3,4 - 1 matrix
-LedControl lc=LedControl(4,3,2,3); // 3x ledmatrix
+LedControl lc=LedControl(12,11,10,3); // 3x ledmatrix
 
 // buffer for 8x8 ledmatrix
 
-uint8_t buffer[8][5] = {0};
+uint8_t buffer[39] = {0};   // 8x5
 
 /*
- buffer[][0] is invisible right to the display
- buffer[][1:3] is the visible part on 3 matrix
- buffer[][4] is invisible left to the display
+ buffer[][0-7] is invisible right to the display
+ buffer[][8-31] is the visible part on 3 matrix
+ buffer[][32-39] is invisible left to the display
 */
 
 const int scrolldelay = 60;
@@ -54,7 +54,7 @@ void setup() {
 
 void buffer2led(int LEDid, int buffid) {
   for(int row=0;row<8;row++) {
-    lc.setRow(LEDid,row,buffer[row][buffid]); // write buffer to ledmatrix
+    lc.setRow(LEDid,row,buffer[row+(8*buffid-1)]); // write buffer to ledmatrix
   }
 }
 /*
@@ -67,6 +67,7 @@ void shiftbuffer() {
   }
 }*/
 
+/*
 void shiftbufferleft(int bufffrom, int buffto) {
 //for each row
   for(int row=0;row<8;row++) {
@@ -76,21 +77,22 @@ void shiftbufferleft(int bufffrom, int buffto) {
     buffer[row][buffto] =  buffer[row][buffto] | ( buffer[row][bufffrom] >> 7 );
   }
 }
-
-void shiftdisplayleft(int nrofbuffer) { //3 matrix = 5 buffer
-/* shift very left (3) buffer to invisible (4)
-  continue till very right (1) which gets data from invisble (0) 
 */
+/*
+void shiftdisplayleft(int nrofbuffer) { //3 matrix = 5 buffer
+// shift very left (3) buffer to invisible (4)
+/  continue till very right (1) which gets data from invisble (0) 
+
   for(int i=nrofbuffer-1;i=1;i--) { 
     shiftbufferleft(i-1,i);
   }
 }
-
+*/
 
 void clearbuffer( int nrofbuffer) {
   for (int buffid=0;buffid<nrofbuffer;buffid++) {
     for(int row=0;row<8;row++) {
-      buffer[row][buffid] = 0;
+      buffer[row+(8*buffid-1)] = 0;
     }
   }
 }
@@ -131,14 +133,18 @@ void loop() {
 // This is the main loop
 
 // test
-clearbuffer(5);
-buffer[2][1]= 19; // 1+2+16.. 1st, 2nd, and 4th dot in 3rd line
+/*clearbuffer(5);
+buffer[22]= 19; // 1+2+16.. 1st, 2nd, and 4th dot in 3rd line
 buffer2led(2,1);
+*/
 
+lc.setLed(0,0,0,true);
+lc.setLed(1,0,0,true);
+lc.setLed(2,0,0,true);
 	
     delay(3000);
 
- shiftdisplayleft(5);
+ // shiftdisplayleft(5);
 
 
 }
