@@ -57,6 +57,26 @@ void buffer2led(int LEDid, int buffid) {
     lc.setRow(LEDid,row,buffer[row+(8*buffid-1)]); // write buffer to ledmatrix
   }
 }
+
+
+void buffer2led2() {
+  for(int row=0;row<8;row++) {
+    lc.setColumn(0,row,mirror(buffer[row+ 8])); // write buffer to ledmatrix
+    lc.setColumn(1,row,mirror(buffer[row+16])); // write buffer to ledmatrix
+    lc.setColumn(2,row,mirror(buffer[row+24])); // write buffer to ledmatrix
+  }
+}
+
+unsigned char mirror( unsigned char a )
+{
+  a = ((a >> 4) & 0x0F) | ((a << 4) & 0xF0);
+  a = ((a >> 2) & 0x33) | ((a << 2) & 0xCC);
+  a = ((a >> 1) & 0x55) | ((a << 1) & 0xAA);
+
+  return a;
+}
+
+
 /*
 void shiftbuffer() {
 
@@ -133,16 +153,19 @@ void loop() {
 // This is the main loop
 
 // test
-/*clearbuffer(5);
-buffer[22]= 19; // 1+2+16.. 1st, 2nd, and 4th dot in 3rd line
-buffer2led(2,1);
-*/
+clearbuffer(5);
+buffer[8]=0b0101010101;
+buffer[16]= 0b00001111; // 1+2+16.. 1st, 2nd, and 4th dot in 3rd line
+buffer[24]= 0b11110000; // 1+2+16.. 1st, 2nd, and 4th dot in 3rd line
 
+buffer2led2();
+
+/*
 lc.setLed(0,0,0,true);
 lc.setLed(1,0,0,true);
 lc.setLed(2,0,0,true);
-	
-    delay(3000);
+*/	
+    delay(10);
 
  // shiftdisplayleft(5);
 
