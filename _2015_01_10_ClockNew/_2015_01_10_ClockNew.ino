@@ -1,4 +1,5 @@
 // #define DEBUG //(un)comment this line for debug
+ #define NETPLUGGED 
 
 #ifdef DEBUG
 	#define DEBUG_PRINT(x) Serial.println(x)
@@ -10,20 +11,22 @@
 #include "LedControl.h"
 #include "LEDmatrixclockfont.h"
 #include <SPI.h>  
-#include <Time.h>
+#include <Ethernet.h>
+#include <EthernetUdp.h>
+#include "Time.h"
 #include "OneButton.h"
 
 /* Hardware
 
- pin 12 is connected to the DataIn 
- pin 11 is connected to the CLK 
- pin 10 is connected to CS/LOAD 
+ pin 6 is connected to the DataIn 
+ pin 5 is connected to the CLK 
+ pin 4 is connected to CS/LOAD 
  We have only a single MAX72XX.
  */
 
 
 // LedControl lc=LedControl(4,3,2,1); pins 2,3,4 - 1 matrix
-LedControl lc=LedControl(12,11,10,3); // 3x ledmatrix
+LedControl lc=LedControl(6,5,4,3); // 3x ledmatrix
 
 // BUtton
 OneButton button(A3, true);
@@ -40,9 +43,32 @@ uint8_t buffer[39] = {0};   // 8x5
 
 const int scrolldelay = 60;
 
+time_t t = 0;
+int lastsec = 0;
+
 const unsigned long seventy_years = 2208988800UL;
 byte myhour = 0;
 byte myminute = 0;
+
+byte mac[] = { 0x00, 0x11, 0x95, 0x29, 0x0E, 0x92 };
+
+byte ip[] = { 10, 0, 0, 26 };                  // ip address
+byte gateway[] = { 10, 0, 0, 138 };                  // internet access via router
+byte subnet[] = { 255, 0, 0, 0 };                   //subnet mask
+
+unsigned int localPort = 8888;      // local port to listen for UDP packets
+
+IPAddress timeServer(80,92,126,650); // 0.at.pool.ntp.org
+// IPAddress timeServer(83,137,41,12); // 0.at.pool.ntp.org
+
+EthernetClient client;
+
+const int NTP_PACKET_SIZE= 48; // NTP time stamp is in the first 48 bytes of the message
+
+byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets 
+
+// A UDP instance to let us send and receive packets over UDP
+EthernetUDP Udp;
 
 
 void setup() {
@@ -52,6 +78,7 @@ void setup() {
    
    button.attachDoubleClick(doubleclick);
 
+  
   
   // init all matrix
   //nr was set when  creating LedControl
@@ -65,6 +92,80 @@ void setup() {
     /* and clear the display */
     lc.clearDisplay(address);
   }
+  
+  // start Ethernet and UDP
+#ifdef NETPLUGGED
+  if (Ethernet.begin(mac) == 0) {
+    DEBUG_PRINT("Failed to configure Ethernet using DHCP");
+    // no point in carrying on, so do nothing forevermore:
+    for(;;)
+      ;
+  }
+  
+  Udp.begin(localPort);
+  
+  getNTPtime();
+#endif
+}
+
+
+void getNTPtime() {
+
+  sendNTPpacket(timeServer); // send an NTP packet to a time server
+
+  DEBUG_PRINT("sending"); 
+  
+  // wait to see if a reply is available
+  delay(2000);  
+  if ( Udp.parsePacket() ) {  
+    // We've received a packet, read the data from it
+    Udp.read(packetBuffer,NTP_PACKET_SIZE);  // read the packet into the buffer
+
+    //the timestamp starts at byte 40 of the received packet and is four bytes,
+    // or two words, long. First, esxtract the two words:
+
+    unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
+    unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
+    unsigned long secsSince1900 = highWord << 16 | lowWord;    
+    unsigned long epoch = secsSince1900 - 2208988800UL;
+    DEBUG_PRINT(epoch); 
+    
+    // myhour =  (epoch  % 86400L) / 3600 ;
+    // myminute =  (epoch  % 3600) / 60;
+
+   setTime(epoch);
+
+    DEBUG_PRINT(myhour); 
+    DEBUG_PRINT(myminute); 
+    
+  } else {
+    DEBUG_PRINT("no answer"); 
+  }
+}
+
+
+
+unsigned long sendNTPpacket(IPAddress& address)
+{
+  // set all bytes in the buffer to 0
+  memset(packetBuffer, 0, NTP_PACKET_SIZE); 
+  // Initialize values needed to form NTP request
+  // (see URL above for details on the packets)
+  packetBuffer[0] = 0b11100011;   // LI, Version, Mode
+  packetBuffer[1] = 0;     // Stratum, or type of clock
+  packetBuffer[2] = 6;     // Polling Interval
+  packetBuffer[3] = 0xEC;  // Peer Clock Precision
+  // 8 bytes of zero for Root Delay & Root Dispersion
+  packetBuffer[12]  = 49; 
+  packetBuffer[13]  = 0x4E;
+  packetBuffer[14]  = 49;
+  packetBuffer[15]  = 52;
+
+  // all NTP fields have been given values, now
+  // you can send a packet requesting a timestamp: 		   
+  Udp.beginPacket(address, 123); //NTP requests are to port 123
+  Udp.write(packetBuffer,NTP_PACKET_SIZE);
+  Udp.endPacket(); 
 }
 
 
@@ -156,16 +257,38 @@ void doubleclick() {
 
 
 void loop() { 
-  button.tick();
+    button.tick();
+    int schalter = digitalRead(2);
+    
+    if (schalter == LOW) {
+        time2buffer(hour(t),minute(t));
+    } else {
+        time2buffer(day(t),month(t));
+    }
+    
+    t = now();
+    int currentsec = second(t);  
   
-  time2buffer(16,39);
+    if (lastsec !=  currentsec ) {
+        if ( ((2 * lastsec) % 2) == 0 ) {
+            buffer[23] = 0b00011000;
+        }
+        else {
+             buffer[23] = 0b00000000;
+        }
+        lastsec = currentsec;
+        
+    }
   
   
-  int schalter = digitalRead(2);
-  if (schalter == LOW) {
+  
+  
+  /*
+  
+ 
     buffer[23] = 0b00011000;
   }
-
+  */
     buffer2led2(); 
 
   
