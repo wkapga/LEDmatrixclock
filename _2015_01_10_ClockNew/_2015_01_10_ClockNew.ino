@@ -178,14 +178,14 @@ void buffer2led(int LEDid, int buffid) {
 
 
 void buffer2led2() {
-  for(int row=0;row<8;row++) {
+	for(int row=0;row<8;row++) {
 /*    lc.setColumn(0,row,mirror(buffer[row+ 8])); // write buffer to ledmatrix
     lc.setColumn(1,row,mirror(buffer[row+16])); // write buffer to ledmatrix
     lc.setColumn(2,row,mirror(buffer[row+24])); // write buffer to ledmatrix */
-  lc.setColumn(0,row,(buffer[15-row]));
-  lc.setColumn(1,row,(buffer[23-row]));
-  lc.setColumn(2,row,(buffer[31-row]));
-}
+			lc.setColumn(0,row,(buffer[15-row]));
+			lc.setColumn(1,row,(buffer[23-row]));
+			lc.setColumn(2,row,(buffer[31-row]));
+	}
 }
 
 unsigned char mirror( unsigned char a )
