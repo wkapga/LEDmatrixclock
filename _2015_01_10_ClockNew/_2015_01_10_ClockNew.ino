@@ -1,4 +1,4 @@
-// #define DEBUG //(un)comment this line for debug
+ #define DEBUG //(un)comment this line for debug
  #define NETPLUGGED 
 
 #ifdef DEBUG
@@ -14,7 +14,7 @@
 #include <Ethernet.h>
 #include <EthernetUdp.h>
 #include "Time.h"
-#include "OneButton.h"
+//#include "OneButton.h"
 
 /* Hardware
 
@@ -29,7 +29,7 @@
 LedControl lc=LedControl(6,5,4,3); // 3x ledmatrix
 
 // BUtton
-OneButton button(A3, true);
+// OneButton button(A3, true);
 
 // buffer for 8x8 ledmatrix
 
@@ -46,19 +46,19 @@ const int scrolldelay = 60;
 time_t t = 0;
 int lastsec = 0;
 
-const unsigned long seventy_years = 2208988800UL;
 byte myhour = 0;
 byte myminute = 0;
 
+// use your own mac
 byte mac[] = { 0x00, 0x11, 0x95, 0x29, 0x0E, 0x92 };
 
-byte ip[] = { 10, 0, 0, 26 };                  // ip address
+byte ip[] = { 10, 0, 0, 40 };                  // ip address
 byte gateway[] = { 10, 0, 0, 138 };                  // internet access via router
 byte subnet[] = { 255, 0, 0, 0 };                   //subnet mask
 
 unsigned int localPort = 8888;      // local port to listen for UDP packets
 
-IPAddress timeServer(80,92,126,650); // 0.at.pool.ntp.org
+IPAddress timeServer(91,118,20,250); // 0.at.pool.ntp.org
 // IPAddress timeServer(83,137,41,12); // 0.at.pool.ntp.org
 
 EthernetClient client;
@@ -70,15 +70,23 @@ byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing pack
 // A UDP instance to let us send and receive packets over UDP
 EthernetUDP Udp;
 
+const unsigned long seventy_years = 2208988800UL;
+
 
 void setup() {
   
    pinMode(2, INPUT_PULLUP);
  //  pinMode(3, INPUT_PULLUP);
    
-   button.attachDoubleClick(doubleclick);
+ //  button.attachDoubleClick(doubleclick);
 
-  
+#ifdef DEBUG
+ Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  } 
+#endif
+ 
   
   // init all matrix
   //nr was set when  creating LedControl
@@ -103,6 +111,8 @@ void setup() {
   }
   
   Udp.begin(localPort);
+  
+  // setTime(12,12,12,11,11,11);
   
   getNTPtime();
 #endif
@@ -257,7 +267,7 @@ void doubleclick() {
 
 
 void loop() { 
-    button.tick();
+//    button.tick();
     int schalter = digitalRead(2);
     
     if (schalter == LOW) {
@@ -281,6 +291,8 @@ void loop() {
     }
   
   
+  
+ // if ( currentsec == 30) {  getNTPtime(); };
   
   
   /*

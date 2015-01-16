@@ -26,7 +26,7 @@
  pin 2 is connected to CS/LOAD 
  We have only a single MAX72XX.
  */
-LedControl lc=LedControl(4,3,2,1);
+LedControl lc=LedControl(6,5,4,1);
 
 // buffer for 8x8 ledmatrix
 byte buffer[8] = {0};
