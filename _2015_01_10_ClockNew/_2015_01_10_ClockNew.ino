@@ -14,7 +14,7 @@
 #include <Ethernet.h>
 #include <EthernetUdp.h>
 #include "Time.h"
-//#include "OneButton.h"
+ #include "OneButton.h"
 
 /* Hardware
 
@@ -29,7 +29,7 @@
 LedControl lc=LedControl(6,5,4,3); // 3x ledmatrix
 
 // BUtton
-// OneButton button(A3, true);
+ OneButton button(3, true);
 
 // buffer for 8x8 ledmatrix
 
@@ -76,17 +76,19 @@ const unsigned long seventy_years = 2208988800UL;
 void setup() {
   
    pinMode(2, INPUT_PULLUP);
- //  pinMode(3, INPUT_PULLUP);
+   pinMode(3, INPUT_PULLUP);
    
- //  button.attachDoubleClick(doubleclick);
-
+   button.attachDoubleClick(doubleclick);
+/*
 #ifdef DEBUG
  Serial.begin(9600);
    while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   } 
 #endif
+ */
  
+ delay(800); // make some time for networkcard ini
   
   // init all matrix
   //nr was set when  creating LedControl
@@ -142,8 +144,15 @@ void getNTPtime() {
     
     // myhour =  (epoch  % 86400L) / 3600 ;
     // myminute =  (epoch  % 3600) / 60;
-
-   setTime(epoch);
+  setTime(epoch);
+  delay(60);
+  
+  /*time_t tt = now();
+  tt = tt + 3600 * adjusttimetoCET(tt);
+  
+  setTime(tt);
+  */
+  adjustTime(3600 * adjusttimetoCET( now() )); 
 
     DEBUG_PRINT(myhour); 
     DEBUG_PRINT(myminute); 
@@ -207,8 +216,27 @@ unsigned char mirror( unsigned char a )
   return a;
 }
 
+int adjusttimetoCET(time_t t) {
 
+    int hours;
 
+    int m = month(t);
+    int y = year(t);
+    int d = day(t);
+
+    // EU summertime rules
+    int marchday = 31 - ((5*y/4 +4) % 7);
+    int octoberday = 31 - ((5*y/4 +1) % 7);
+
+    if ( (m < 3) || (m > 10) ||   // nov-feb is winter
+	( (m ==3) && ( d < marchday) ) ||  // so is before last sunday in march
+	( (m == 10) && (d >= octoberday) ) ) { // and also from last sunday in october
+		hours = 1; // hardcoded for CE(S)T
+	} else {
+		hours = 2; // summertime!
+    }
+    return hours;
+}
 
 void clearbuffer( int buffid) {
   for(int row=0;row<8;row++) {
@@ -260,16 +288,19 @@ void time2buffer(int h, int m){
 
 
 void doubleclick() {
- buffer[23] = 0b10000001; 
+ // 
 
 }  
 
 
 
 void loop() { 
-//    button.tick();
+    
     int schalter = digitalRead(2);
     
+    int blinkit = 1;
+   
+    // t = t + 3600 * adjusttimetoCET(t);
     if (schalter == LOW) {
         time2buffer(hour(t),minute(t));
     } else {
@@ -279,7 +310,7 @@ void loop() {
     t = now();
     int currentsec = second(t);  
   
-    if (lastsec !=  currentsec ) {
+    if ( ( lastsec !=  currentsec ) & (blinkit != 0) )   {
         if ( ((2 * lastsec) % 2) == 0 ) {
             buffer[23] = 0b00011000;
         }
@@ -301,6 +332,8 @@ void loop() {
     buffer[23] = 0b00011000;
   }
   */
+    button.tick();
+  
     buffer2led2(); 
 
   
